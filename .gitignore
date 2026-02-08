@@ -25,3 +25,6 @@ dist-ssr
 .agents/*
 .agent/*
 
+# Tauri build artifacts
+src-tauri/target
+
