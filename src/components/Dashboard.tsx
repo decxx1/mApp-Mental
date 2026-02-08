@@ -7,20 +7,21 @@ import {
     Hash,
     Folder,
     Star,
-    Calendar,
-    TrendingUp,
-    Clock,
-    Zap
+    ChevronDown,
+    Clock
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { MindMapView } from './MindMapView';
+import { useState } from 'react';
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
 export const Dashboard: React.FC = () => {
-    const { themes, categories, notes } = useAppStore();
+    const { themes, categories, notes, setSelectedNote } = useAppStore();
+    const [isRecentCollapsed, setIsRecentCollapsed] = useState(false);
 
     const stats = [
         { label: 'Temas', value: themes.length, icon: Folder, color: 'text-violet-400', bg: 'bg-violet-500/10' },
@@ -31,175 +32,121 @@ export const Dashboard: React.FC = () => {
 
     const recentNotes = [...notes]
         .sort((a, b) => b.updatedAt - a.updatedAt)
-        .slice(0, 5);
-
-    const container = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1
-            }
-        }
-    };
-
-    const item = {
-        hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0 }
-    };
+        .slice(0, 10);
 
     return (
-        <div className="flex-1 overflow-y-auto bg-[#0c0c0e] custom-scrollbar">
-            <div className="max-w-6xl mx-auto py-12 px-8">
-                {/* Header */}
-                <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="mb-12"
-                >
-                    <div className="flex items-center gap-4 mb-2">
-                        <div className="w-12 h-12 bg-violet-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-violet-600/40">
-                            <Brain className="w-7 h-7 text-white" />
+        <div className="flex-1 relative bg-[#0c0c0e] overflow-hidden">
+            {/* Background Mind Map View - The centerpiece */}
+            <div className="absolute inset-0 z-0">
+                <MindMapView />
+            </div>
+
+            {/* Overlaid UI - Top Stats Area */}
+            <div className="absolute top-0 left-0 right-0 p-8 z-10 pointer-events-none">
+                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-8">
+                    {/* Brand Info */}
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                    >
+                        <div className="flex items-center gap-4 mb-2">
+                            <h1 className="text-xl lg:text-2xl xl:text-4xl font-black text-white tracking-tight">Tu Mapa Mental</h1>
                         </div>
-                        <h1 className="text-4xl font-black text-white tracking-tight">Tu Mapa Mental</h1>
+                        <p className="text-zinc-500 text-lg">Tu universo de ideas expandido.</p>
+                    </motion.div>
+
+                    {/* Stats HUD (Heads-up Display) */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pointer-events-auto">
+                        {stats.map((stat, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: i * 0.1 }}
+                                className="px-5 py-3 rounded-2xl bg-[#141417]/80 backdrop-blur-xl border border-white/5 flex flex-col items-center justify-center shadow-2xl"
+                            >
+                                <div className="text-xl font-black text-white">{stat.value}</div>
+                                <div className="text-[9px] text-zinc-500 font-bold uppercase tracking-[0.15em]">{stat.label}</div>
+                            </motion.div>
+                        ))}
                     </div>
-                    <p className="text-zinc-500 text-lg">Visualiza y organiza tus pensamientos de un vistazo.</p>
-                </motion.div>
-
-                {/* Grid Stats */}
-                <motion.div
-                    variants={container}
-                    initial="hidden"
-                    animate="show"
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
-                >
-                    {stats.map((stat, i) => (
-                        <motion.div
-                            key={i}
-                            variants={item}
-                            className="p-6 rounded-3xl bg-[#141417] border border-[#26262b] hover:border-violet-500/30 transition-all group"
-                        >
-                            <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 duration-300", stat.bg)}>
-                                <stat.icon className={cn("w-6 h-6", stat.color)} />
-                            </div>
-                            <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                            <div className="text-zinc-500 text-sm font-medium uppercase tracking-wider">{stat.label}</div>
-                        </motion.div>
-                    ))}
-                </motion.div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left & Center: Mental Structure Visual */}
-                    <motion.div
-                        variants={item}
-                        initial="hidden"
-                        animate="show"
-                        className="lg:col-span-2 space-y-6"
-                    >
-                        <div className="p-8 rounded-3xl bg-[#141417] border border-[#26262b] relative overflow-hidden min-h-[400px]">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/5 blur-[100px] rounded-full -mr-32 -mt-32 pointer-events-none" />
-
-                            <div className="flex items-center justify-between mb-8">
-                                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                                    <TrendingUp className="w-5 h-5 text-violet-400" />
-                                    Estructura de Pensamiento
-                                </h2>
-                                <div className="px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 text-[10px] font-bold uppercase tracking-widest">Vista Lógica</div>
-                            </div>
-
-                            <div className="space-y-4">
-                                {themes.slice(0, 4).map((theme) => {
-                                    const themeCategories = categories.filter(c => c.themeId === theme.id);
-                                    const themeNotesCount = notes.filter(n => themeCategories.find(c => c.id === n.categoryId)).length;
-                                    const percentage = notes.length > 0 ? (themeNotesCount / notes.length) * 100 : 0;
-
-                                    return (
-                                        <div key={theme.id} className="space-y-2">
-                                            <div className="flex justify-between items-center text-sm">
-                                                <span className="text-zinc-300 font-medium flex items-center gap-2">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-violet-500" />
-                                                    {theme.name}
-                                                </span>
-                                                <span className="text-zinc-500">{themeNotesCount} notas</span>
-                                            </div>
-                                            <div className="h-2 w-full bg-[#1a1a1e] rounded-full overflow-hidden">
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: `${percentage}%` }}
-                                                    transition={{ duration: 1, ease: "easeOut" }}
-                                                    className="h-full bg-gradient-to-r from-violet-600 to-indigo-500 rounded-full"
-                                                />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-
-                                {themes.length === 0 && (
-                                    <div className="h-40 flex flex-col items-center justify-center text-zinc-600 border border-dashed border-zinc-800 rounded-2xl">
-                                        <Brain className="w-8 h-8 opacity-20 mb-2" />
-                                        <p className="text-sm">Crea temas para ver tu mapa mental</p>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="mt-12 grid grid-cols-2 gap-4">
-                                <div className="p-4 rounded-2xl bg-[#0c0c0e] border border-[#26262b] flex items-center gap-3">
-                                    <Zap className="w-5 h-5 text-amber-400" />
-                                    <div>
-                                        <div className="text-white font-bold text-sm">Productividad</div>
-                                        <div className="text-zinc-500 text-[10px]">Mapa en crecimiento</div>
-                                    </div>
-                                </div>
-                                <div className="p-4 rounded-2xl bg-[#0c0c0e] border border-[#26262b] flex items-center gap-3">
-                                    <Clock className="w-5 h-5 text-blue-400" />
-                                    <div>
-                                        <div className="text-white font-bold text-sm">Última Actividad</div>
-                                        <div className="text-zinc-500 text-[10px]">Hace un momento</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    {/* Right: Recent Notes */}
-                    <motion.div
-                        variants={item}
-                        initial="hidden"
-                        animate="show"
-                        className="space-y-6"
-                    >
-                        <div className="p-6 rounded-3xl bg-[#141417] border border-[#26262b] h-full">
-                            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                                <Calendar className="w-5 h-5 text-emerald-400" />
-                                Notas Recientes
-                            </h2>
-                            <div className="space-y-3">
-                                {recentNotes.map((note) => (
-                                    <div
-                                        key={note.id}
-                                        className="p-4 rounded-2xl bg-[#1a1a1e] border border-[#26262b] hover:border-violet-500/30 transition-all cursor-pointer group"
-                                    >
-                                        <h3 className="text-sm font-bold text-white mb-1 group-hover:text-violet-400 transition-colors truncate">
-                                            {note.title || 'Sin título'}
-                                        </h3>
-                                        <div className="flex items-center justify-between text-[10px] text-zinc-500">
-                                            <span>{new Date(note.updatedAt).toLocaleDateString()}</span>
-                                            <div className="flex items-center gap-1">
-                                                <div className="w-1 h-1 rounded-full bg-zinc-700" />
-                                                <span>{categories.find(c => c.id === note.categoryId)?.name || 'Sueltas'}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-
-                                {notes.length === 0 && (
-                                    <p className="text-zinc-600 text-sm text-center py-8">No hay notas recientes</p>
-                                )}
-                            </div>
-                        </div>
-                    </motion.div>
                 </div>
             </div>
+
+            {/* Overlaid UI - Right Sidebar (Recent Activity) */}
+            <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                animate={{
+                    opacity: 1,
+                    x: 0,
+                    height: isRecentCollapsed ? '56px' : 'calc(100vh - 160px)'
+                }}
+                className="absolute top-32 right-8 w-72 z-10 pointer-events-auto overflow-hidden transition-all duration-300 ease-in-out"
+            >
+                <div className="h-full rounded-3xl bg-[#141417]/70 backdrop-blur-2xl border border-white/5 shadow-2xl flex flex-col">
+                    <div
+                        className="px-6 py-4 border-b border-white/5 flex items-center justify-between cursor-pointer hover:bg-white/[0.02] transition-colors"
+                        onClick={() => setIsRecentCollapsed(!isRecentCollapsed)}
+                    >
+                        <h2 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2 text-nowrap">
+                            <Clock className="w-4 h-4 text-violet-400" />
+                            Recientes
+                        </h2>
+                        <motion.button
+                            animate={{ rotate: isRecentCollapsed ? 180 : 0 }}
+                            className="p-1 hover:bg-white/5 rounded-lg transition-colors"
+                        >
+                            <ChevronDown className="w-4 h-4 text-zinc-400" />
+                        </motion.button>
+                    </div>
+
+                    <div className={cn(
+                        "flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar transition-opacity duration-300",
+                        isRecentCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
+                    )}>
+                        {recentNotes.map((note) => (
+                            <motion.div
+                                key={note.id}
+                                whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.03)' }}
+                                onClick={() => setSelectedNote(note.id)}
+                                className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 group cursor-pointer transition-all"
+                            >
+                                <h3 className="text-xs font-bold text-zinc-300 mb-1 group-hover:text-violet-400 transition-colors truncate">
+                                    {note.title || 'Sin título'}
+                                </h3>
+                                <div className="flex items-center justify-between text-[9px] text-zinc-600 font-medium">
+                                    <span>{new Date(note.updatedAt).toLocaleDateString()}</span>
+                                    <span className="truncate max-w-[80px]">
+                                        {categories.find(c => c.id === note.categoryId)?.name || 'Sueltas'}
+                                    </span>
+                                </div>
+                            </motion.div>
+                        ))}
+
+                        {notes.length === 0 && (
+                            <div className="text-center py-12">
+                                <FileText className="w-8 h-8 text-zinc-800 mx-auto mb-3" />
+                                <p className="text-xs text-zinc-600 italic">No hay actividad aún</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {!isRecentCollapsed && (
+                        <div className="p-4 bg-violet-600/5 rounded-b-3xl">
+                            <div className="flex justify-between items-center px-2">
+                                <span className="text-[9px] text-violet-300 font-bold uppercase">Actividad Mapa</span>
+                                <div className="flex gap-1">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-violet-500/50" />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </motion.div>
+
+            {/* Subtle Gradient Shadow (Bottom) */}
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0c0c0e] to-transparent pointer-events-none z-0" />
         </div>
     );
 };
