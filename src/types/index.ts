@@ -17,4 +17,6 @@ export interface Theme {
   id: string;
   name: string;
   icon: string;
+  isFavorite?: boolean;
+  order: number;
 }

@@ -37,7 +37,7 @@ export const Modal: React.FC = () => {
     const Icon = options.type === 'prompt' ? HelpCircle :
         options.type === 'confirm' ? AlertCircle : Info;
 
-    const iconColor = options.type === 'confirm' ? 'text-red-400' : 'text-indigo-400';
+    const iconColor = options.type === 'confirm' ? 'text-red-400' : 'text-violet-400';
 
     return (
         <AnimatePresence>
@@ -82,7 +82,7 @@ export const Modal: React.FC = () => {
                                                     if (e.key === 'Escape') handleCancel();
                                                 }}
                                                 placeholder={options.placeholder}
-                                                className="w-full bg-[#0c0c0e] border border-[#26262b] rounded-xl px-4 py-2.5 text-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all"
+                                                className="w-full bg-[#0c0c0e] border border-[#26262b] rounded-xl px-4 py-2.5 text-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 transition-all"
                                             />
                                         </div>
                                     )}
@@ -111,7 +111,7 @@ export const Modal: React.FC = () => {
                                     "px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-lg",
                                     options.type === 'confirm'
                                         ? "bg-red-500 hover:bg-red-600 text-white shadow-red-500/20"
-                                        : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/20"
+                                        : "bg-violet-700 hover:bg-violet-800 text-white shadow-violet-900/40"
                                 )}
                             >
                                 {options.confirmLabel || (options.type === 'alert' ? 'Entendido' : 'Confirmar')}

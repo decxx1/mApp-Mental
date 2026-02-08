@@ -14,6 +14,8 @@ interface AppState {
   addTheme: (name: string, icon: string) => void;
   updateTheme: (id: string, name: string, icon: string) => void;
   deleteTheme: (id: string) => void;
+  toggleThemeFavorite: (id: string) => void;
+  reorderThemes: (themes: Theme[]) => void;
 
   addCategory: (themeId: string, name: string) => void;
   updateCategory: (id: string, name: string) => void;
@@ -22,6 +24,7 @@ interface AppState {
   addNote: (categoryId: string, title: string) => string;
   updateNote: (id: string, title: string, content: string) => void;
   deleteNote: (id: string) => void;
+  moveNote: (noteId: string, targetCategoryId: string) => void;
   
   setSelectedNote: (id: string | null) => void;
   setSelectedTheme: (id: string | null) => void;
@@ -40,7 +43,10 @@ export const useAppStore = create<AppState>()(
 
       addTheme: (name, icon) => set((state) => {
         const id = crypto.randomUUID();
-        return { themes: [...state.themes, { id, name, icon }] };
+        const maxOrder = state.themes.reduce((max, t) => Math.max(max, t.order || 0), -1);
+        return { 
+          themes: [...state.themes, { id, name, icon, order: maxOrder + 1, isFavorite: false }] 
+        };
       }),
       updateTheme: (id, name, icon) => set((state) => ({
         themes: state.themes.map((t) => (t.id === id ? { ...t, name, icon } : t)),
@@ -51,6 +57,10 @@ export const useAppStore = create<AppState>()(
         notes: state.notes.filter((n) => !state.categories.find(c => c.id === n.categoryId && c.themeId === id)),
         selectedThemeId: state.selectedThemeId === id ? null : state.selectedThemeId
       })),
+      toggleThemeFavorite: (id) => set((state) => ({
+        themes: state.themes.map((t) => t.id === id ? { ...t, isFavorite: !t.isFavorite } : t)
+      })),
+      reorderThemes: (themes) => set({ themes }),
 
       addCategory: (themeId, name) => set((state) => {
         const id = crypto.randomUUID();
@@ -87,6 +97,11 @@ export const useAppStore = create<AppState>()(
       deleteNote: (id) => set((state) => ({
         notes: state.notes.filter((n) => n.id !== id),
         selectedNoteId: state.selectedNoteId === id ? null : state.selectedNoteId
+      })),
+      moveNote: (noteId, targetCategoryId) => set((state) => ({
+        notes: state.notes.map((n) =>
+          n.id === noteId ? { ...n, categoryId: targetCategoryId, updatedAt: Date.now() } : n
+        ),
       })),
 
       setSelectedNote: (id) => set({ selectedNoteId: id }),

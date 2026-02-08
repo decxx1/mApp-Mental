@@ -23,7 +23,7 @@ function App() {
         </AnimatePresence>
 
         {/* Background gradient effect */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-800/10 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none" />
       </main>
     </div>
   );
