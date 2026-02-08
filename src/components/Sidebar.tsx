@@ -382,7 +382,14 @@ export const Sidebar: React.FC = () => {
             onDragCancel={() => setActiveId(null)}
         >
             <div className="w-72 h-screen bg-[#141417] border-r border-[#26262b] flex flex-col text-[#e2e8f0] overflow-hidden select-none">
-                <div className="p-6 flex items-center gap-3 border-b border-[#26262b]">
+                <div
+                    className="p-6 flex items-center gap-3 border-b border-[#26262b] cursor-pointer hover:bg-white/[0.02] transition-colors"
+                    onClick={() => {
+                        setSelectedNote(null);
+                        setSelectedTheme(null);
+                        setSelectedCategory(null);
+                    }}
+                >
                     <div className="w-10 h-10 bg-violet-700 rounded-xl flex items-center justify-center shadow-lg shadow-violet-900/30">
                         <Brain className="w-6 h-6 text-white" />
                     </div>
@@ -538,16 +545,8 @@ export const Sidebar: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="p-4 bg-[#0c0c0e] border-t border-[#26262b] mt-auto flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-zinc-800 to-zinc-700 flex items-center justify-center">
-                            <span className="text-[10px] font-bold">U</span>
-                        </div>
-                        <p className="text-xs font-medium text-zinc-400">Usuario Local</p>
-                    </div>
-                    <button className="p-1.5 hover:bg-[#1a1a1e] rounded-md transition-colors text-zinc-500">
-                        <MoreVertical className="w-4 h-4" />
-                    </button>
+                <div className="mt-auto p-4 border-t border-[#26262b]/50">
+                    <p className="text-[10px] text-zinc-600 text-center uppercase tracking-widest font-medium">mApp Mental v1.0</p>
                 </div>
             </div>
 
