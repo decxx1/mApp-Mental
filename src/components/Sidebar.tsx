@@ -8,7 +8,6 @@ import {
     Hash,
     FileText,
     Trash2,
-    MoreVertical,
     Brain,
     GripVertical,
     Star
@@ -371,7 +370,6 @@ export const Sidebar: React.FC = () => {
     };
 
     const favoriteThemes = themes.filter(t => t.isFavorite);
-    const regularThemes = themes.filter(t => !t.isFavorite);
 
     return (
         <DndContext

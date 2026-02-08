@@ -15,8 +15,6 @@ import {
     Heading1,
     Heading2,
     Quote,
-    Undo,
-    Redo,
     Save,
     Clock,
     Type,
