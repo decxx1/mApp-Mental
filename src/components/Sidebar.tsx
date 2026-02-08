@@ -60,6 +60,7 @@ const DraggableNote: React.FC<DraggableNoteProps> = ({ note, selectedNoteId, set
     const style = transform ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
         opacity: isDragging ? 0.5 : 1,
+        zIndex: isDragging ? 50 : 'auto',
     } : undefined;
 
     return (
@@ -175,13 +176,19 @@ const SortableThemeItem: React.FC<SortableThemeItemProps> = ({
         transform,
         transition,
         isDragging
-    } = useSortable({ id: theme.id });
+    } = useSortable({
+        id: theme.id,
+        data: {
+            type: 'theme',
+            themeId: theme.id
+        }
+    });
 
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
-        opacity: isDragging ? 0.5 : 1,
-        zIndex: isDragging ? 50 : 'auto',
+        opacity: isDragging ? 0.3 : 1, // Slightly more transparent when dragging
+        zIndex: isDragging ? 100 : 'auto',
     };
 
     return (
@@ -199,7 +206,7 @@ const SortableThemeItem: React.FC<SortableThemeItemProps> = ({
                     </div>
                     {isExpanded ? <ChevronDown className="w-4 h-4 flex-shrink-0" /> : <ChevronRight className="w-4 h-4 flex-shrink-0" />}
                     <span className="font-medium truncate">{theme.name}</span>
-                    {theme.isFavorite && <Star className="w-3 h-3 text-amber-500 fill-amber-500" />}
+                    {theme.isFavorite && <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500 ml-auto mr-2" />}
                 </div>
                 <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
@@ -286,7 +293,7 @@ export const Sidebar: React.FC = () => {
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
-                distance: 8,
+                distance: 5, // Reduced distance for faster activation
             },
         })
     );
@@ -332,26 +339,30 @@ export const Sidebar: React.FC = () => {
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
 
-        if (!over) return;
-
-        const activeIdStr = active.id as string;
-        const overIdStr = over.id as string;
-
-        // Handle Theme Reordering
-        if (activeIdStr.startsWith('theme-') || !activeIdStr.includes('-')) {
-            // Check if both are themes (dnd-kit-sortable uses just IDs)
-            const activeIndex = themes.findIndex(t => t.id === activeIdStr);
-            const overIndex = themes.findIndex(t => t.id === overIdStr);
-
-            if (activeIndex !== -1 && overIndex !== -1 && activeIndex !== overIndex) {
-                reorderThemes(arrayMove(themes, activeIndex, overIndex));
-            }
+        if (!over) {
+            setActiveId(null);
+            return;
         }
 
-        // Handle Note Moving (Draggable/Droppable)
         const activeData = active.data.current;
         const overData = over.data.current;
 
+        // --- LOGIC FOR REORDERING THEMES ---
+        if (activeData?.type === 'theme') {
+            const activeId = active.id as string;
+            const overId = over.id as string;
+
+            if (activeId !== overId) {
+                const activeIndex = themes.findIndex(t => t.id === activeId);
+                const overIndex = themes.findIndex(t => t.id === overId);
+
+                if (activeIndex !== -1 && overIndex !== -1) {
+                    reorderThemes(arrayMove(themes, activeIndex, overIndex));
+                }
+            }
+        }
+
+        // --- LOGIC FOR MOVING NOTES ---
         if (activeData?.type === 'note' && overData?.type === 'category') {
             moveNote(activeData.noteId, overData.categoryId);
         }
@@ -359,8 +370,8 @@ export const Sidebar: React.FC = () => {
         setActiveId(null);
     };
 
-    const favoriteThemes = themes.filter(t => t.isFavorite).sort((a, b) => (a.order || 0) - (b.order || 0));
-    const regularThemes = themes.filter(t => !t.isFavorite).sort((a, b) => (a.order || 0) - (b.order || 0));
+    const favoriteThemes = themes.filter(t => t.isFavorite);
+    const regularThemes = themes.filter(t => !t.isFavorite);
 
     return (
         <DndContext
@@ -381,8 +392,8 @@ export const Sidebar: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
-                    {/* Uncategorized Notes Area */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-8 custom-scrollbar">
+                    {/* Section: Loose Notes */}
                     <div className="space-y-2">
                         <div className="flex items-center justify-between px-2 mb-2">
                             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Notas Sueltas</span>
@@ -408,7 +419,7 @@ export const Sidebar: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Favorites Section */}
+                    {/* Section: Favorites (Only view, non-sortable separately to avoid conflicts) */}
                     {favoriteThemes.length > 0 && (
                         <div className="space-y-2">
                             <div className="flex items-center gap-2 px-2 mb-2">
@@ -417,43 +428,56 @@ export const Sidebar: React.FC = () => {
                             </div>
                             <div className="space-y-1">
                                 {favoriteThemes.map((theme) => (
-                                    <SortableThemeItem
-                                        key={theme.id}
-                                        theme={theme}
-                                        isSelected={selectedThemeId === theme.id}
-                                        isExpanded={expandedThemes[theme.id]}
-                                        onToggle={() => toggleTheme(theme.id)}
-                                        onAddCategory={() => handleAddCategory(theme.id)}
-                                        onDelete={() => handleDeleteTheme(theme.id)}
-                                        onFavorite={() => toggleThemeFavorite(theme.id)}
-                                    >
-                                        {categories.filter(c => c.themeId === theme.id).map(category => (
-                                            <DroppableCategory
-                                                key={category.id}
-                                                category={category}
-                                                selectedCategoryId={selectedCategoryId}
-                                                setSelectedCategory={setSelectedCategory}
-                                                handleAddNote={handleAddNote}
-                                                handleDeleteCategory={handleDeleteCategory}
+                                    <div key={theme.id} className="group relative">
+                                        <div
+                                            className={cn(
+                                                "flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all duration-200",
+                                                selectedThemeId === theme.id ? "bg-[#1f1f23] text-violet-400" : "hover:bg-[#1a1a1e] text-zinc-400"
+                                            )}
+                                            onClick={() => toggleTheme(theme.id)}
+                                        >
+                                            <div className="flex items-center gap-2 overflow-hidden flex-1">
+                                                {expandedThemes[theme.id] ? <ChevronDown className="w-4 h-4 flex-shrink-0" /> : <ChevronRight className="w-4 h-4 flex-shrink-0" />}
+                                                <span className="font-medium truncate">{theme.name}</span>
+                                            </div>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); toggleThemeFavorite(theme.id); }}
+                                                className="opacity-0 group-hover:opacity-100 p-1 text-amber-500"
                                             >
-                                                {notes.filter(n => n.categoryId === category.id).map(note => (
-                                                    <DraggableNote
-                                                        key={note.id}
-                                                        note={note}
-                                                        selectedNoteId={selectedNoteId}
-                                                        setSelectedNote={setSelectedNote}
-                                                        handleDeleteNote={handleDeleteNote}
-                                                    />
+                                                <Star className="w-3.5 h-3.5 fill-current" />
+                                            </button>
+                                        </div>
+                                        {expandedThemes[theme.id] && (
+                                            <div className="ml-4 pl-2 border-l border-[#26262b] space-y-1 mt-1">
+                                                {categories.filter(c => c.themeId === theme.id).map(category => (
+                                                    <DroppableCategory
+                                                        key={category.id}
+                                                        category={category}
+                                                        selectedCategoryId={selectedCategoryId}
+                                                        setSelectedCategory={setSelectedCategory}
+                                                        handleAddNote={handleAddNote}
+                                                        handleDeleteCategory={handleDeleteCategory}
+                                                    >
+                                                        {notes.filter(n => n.categoryId === category.id).map(note => (
+                                                            <DraggableNote
+                                                                key={note.id}
+                                                                note={note}
+                                                                selectedNoteId={selectedNoteId}
+                                                                setSelectedNote={setSelectedNote}
+                                                                handleDeleteNote={handleDeleteNote}
+                                                            />
+                                                        ))}
+                                                    </DroppableCategory>
                                                 ))}
-                                            </DroppableCategory>
-                                        ))}
-                                    </SortableThemeItem>
+                                            </div>
+                                        )}
+                                    </div>
                                 ))}
                             </div>
                         </div>
                     )}
 
-                    {/* All Themes Section */}
+                    {/* Section: Themes (Sortable) */}
                     <div className="space-y-2">
                         <div className="flex items-center justify-between px-2 mb-2">
                             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Temas</span>
@@ -514,7 +538,7 @@ export const Sidebar: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="p-4 bg-[#0c0c0e] border-t border-[#26262b] flex items-center justify-between">
+                <div className="p-4 bg-[#0c0c0e] border-t border-[#26262b] mt-auto flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-zinc-800 to-zinc-700 flex items-center justify-center">
                             <span className="text-[10px] font-bold">U</span>
@@ -531,7 +555,7 @@ export const Sidebar: React.FC = () => {
                 sideEffects: defaultDropAnimationSideEffects({
                     styles: {
                         active: {
-                            opacity: '0.5',
+                            opacity: '0.4',
                         },
                     },
                 }),
@@ -543,7 +567,7 @@ export const Sidebar: React.FC = () => {
                             {notes.find(n => `note-${n.id}` === activeId)?.title || 'Nota'}
                         </span>
                     </div>
-                ) : activeId && !activeId.includes('-') && themes.find(t => t.id === activeId) ? (
+                ) : activeId && themes.find(t => t.id === activeId) ? (
                     <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1f1f23] text-violet-400 shadow-2xl border border-violet-500/50 w-64 cursor-grabbing">
                         <GripVertical className="w-3.5 h-3.5 text-zinc-500" />
                         <ChevronRight className="w-4 h-4" />
