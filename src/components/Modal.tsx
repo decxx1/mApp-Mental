@@ -57,11 +57,11 @@ export const Modal: React.FC = () => {
                         initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                        className="relative w-full max-w-md bg-[#141417] border border-[#26262b] rounded-2xl shadow-2xl overflow-hidden"
+                        className="relative w-full max-w-md bg-surface border border-border rounded-2xl shadow-2xl overflow-hidden"
                     >
                         <div className="p-6">
                             <div className="flex items-start gap-4">
-                                <div className={cn("mt-1 p-2 rounded-xl bg-[#1a1a1e] border border-[#26262b]", iconColor)}>
+                                <div className={cn("mt-1 p-2 rounded-xl bg-border-subtle border border-border", iconColor)}>
                                     <Icon className="w-5 h-5" />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -82,7 +82,7 @@ export const Modal: React.FC = () => {
                                                     if (e.key === 'Escape') handleCancel();
                                                 }}
                                                 placeholder={options.placeholder}
-                                                className="w-full bg-[#0c0c0e] border border-[#26262b] rounded-xl px-4 py-2.5 text-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 transition-all"
+                                                className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-zinc-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
                                             />
                                         </div>
                                     )}
@@ -96,11 +96,11 @@ export const Modal: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="px-6 py-4 bg-[#0c0c0e]/50 border-t border-[#26262b] flex items-center justify-end gap-3">
+                        <div className="px-6 py-4 bg-background/50 border-t border-border flex items-center justify-end gap-3">
                             {options.type !== 'alert' && (
                                 <button
                                     onClick={handleCancel}
-                                    className="px-4 py-2 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-[#1a1a1e] transition-all"
+                                    className="px-4 py-2 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-surface-hover transition-all"
                                 >
                                     {options.cancelLabel || 'Cancelar'}
                                 </button>
@@ -110,8 +110,8 @@ export const Modal: React.FC = () => {
                                 className={cn(
                                     "px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-lg",
                                     options.type === 'confirm'
-                                        ? "bg-red-500 hover:bg-red-600 text-white shadow-red-500/20"
-                                        : "bg-violet-700 hover:bg-violet-800 text-white shadow-violet-900/40"
+                                        ? "bg-destructive hover:bg-destructive-hover text-destructive-foreground shadow-destructive/40"
+                                        : "bg-primary hover:bg-primary-hover text-primary-foreground shadow-primary/40"
                                 )}
                             >
                                 {options.confirmLabel || (options.type === 'alert' ? 'Entendido' : 'Confirmar')}

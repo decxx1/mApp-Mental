@@ -1,37 +1,66 @@
 @import "tailwindcss";
 
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@theme {
+  --color-background: #0c0c0e;
+  --color-surface: #141417;
+  --color-surface-hover: #1f1f23;
+  --color-border: #26262b;
+  --color-border-subtle: #1a1a1e;
 
-  color-scheme: dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #0c0c0e;
+  --color-primary: #8b5cf6;
+  --color-primary-hover: #7c3aed;
+  --color-primary-light: #a78bfa;
+  --color-primary-foreground: #ffffff;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --color-destructive: #ef4444;
+  --color-destructive-hover: #dc2626;
+  --color-destructive-foreground: #ffffff;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+@layer base {
+  :root {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color-scheme: dark;
+    background-color: var(--color-background);
+    color: #e2e8f0;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: 20px;
+  }
 }
 
-#root {
-  width: 100%;
+@layer utilities {
+  .layout-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
-/* Custom styles for the Notion-like editor */
+/* TipTap Editor Styles (Prose-like) */
 .ProseMirror {
   outline: none;
-  padding: 1rem;
-  min-height: 500px;
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {
@@ -42,112 +71,76 @@ body {
   height: 0;
 }
 
-/* Typography Scales */
 .ProseMirror h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  color: #fff;
-  letter-spacing: -0.025em;
+  @apply text-5xl font-extrabold mt-12 mb-6 text-white tracking-tight;
 }
 
 .ProseMirror h2 {
-  font-size: 1.875rem;
-  font-weight: 700;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  color: #fff;
-  letter-spacing: -0.025em;
+  @apply text-3xl font-bold mt-10 mb-5 text-white tracking-tight;
 }
 
 .ProseMirror h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-top: 1.25rem;
-  margin-bottom: 0.5rem;
-  color: #fff;
+  @apply text-2xl font-semibold mt-8 mb-4 text-white;
+}
+
+.ProseMirror h4 {
+  @apply text-xl font-semibold mt-6 mb-3 text-white;
+}
+
+.ProseMirror h5 {
+  @apply text-lg font-semibold mt-4 mb-2 text-zinc-200;
+}
+
+.ProseMirror h6 {
+  @apply text-base font-semibold mt-4 mb-2 text-zinc-400;
 }
 
 .ProseMirror p {
-  margin-bottom: 0.75rem;
-  line-height: 1.7;
+  @apply mb-5 leading-loose text-zinc-300;
 }
 
-.ProseMirror ul,
-.ProseMirror ol {
-  padding-left: 1.5rem;
-  margin-bottom: 1rem;
+.ProseMirror mark {
+  @apply bg-violet-500/20 text-violet-400 px-1 py-0.5 rounded;
 }
 
 .ProseMirror ul {
-  list-style-type: disc;
+  @apply list-disc pl-6 mb-6;
 }
 
 .ProseMirror ol {
-  list-style-type: decimal;
+  @apply list-decimal pl-6 mb-6;
 }
 
 .ProseMirror li {
-  margin-bottom: 0.25rem;
+  @apply mb-2;
+}
+
+.ProseMirror li p {
+  @apply mb-1;
 }
 
 .ProseMirror blockquote {
-  border-left: 3px solid #8b5cf6;
-  padding-left: 1rem;
-  font-style: italic;
-  color: #a1a1aa;
-  margin: 1.5rem 0;
+  @apply border-l-4 border-primary pl-6 py-4 my-8 bg-surface/40 italic text-zinc-400 rounded-r-lg;
 }
 
-/* TipTap Table Styles */
+/* Tables */
 .ProseMirror table {
-  border-collapse: collapse;
-  table-layout: fixed;
-  width: 100%;
-  margin: 0;
-  overflow: hidden;
+  @apply w-full border-collapse table-fixed my-8 overflow-hidden rounded-lg border border-border;
 }
 
 .ProseMirror td,
 .ProseMirror th {
-  min-width: 1em;
-  border: 1px solid #26262b;
-  padding: 3px 5px;
-  vertical-align: top;
-  box-sizing: border-box;
-  position: relative;
+  @apply min-w-[1em] border border-border p-3 align-top relative box-border;
 }
 
 .ProseMirror th {
-  font-weight: bold;
-  text-align: left;
-  background-color: #1a1a1e;
+  @apply font-bold text-left bg-surface-hover/50;
 }
 
 .ProseMirror .selectedCell:after {
-  z-index: 2;
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background: rgba(139, 92, 246, 0.1);
-  pointer-events: none;
+  @apply absolute inset-0 bg-primary/10 pointer-events-none content-[''] z-10;
 }
 
 .ProseMirror .column-resize-handle {
-  position: absolute;
-  right: -2px;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background-color: #8b5cf6;
-  pointer-events: none;
-}
-
-/* Sidebar and Main Layout transitions */
-.layout-transition {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  @apply absolute right-[-2px] inset-y-0 w-1 bg-primary pointer-events-none;
 }

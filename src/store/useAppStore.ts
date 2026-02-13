@@ -9,8 +9,10 @@ interface AppState {
   selectedNoteId: string | null;
   selectedThemeId: string | null;
   selectedCategoryId: string | null;
+  isDashboardUiVisible: boolean;
 
   // Actions
+  toggleDashboardUi: () => void;
   addTheme: (name: string, icon: string) => void;
   updateTheme: (id: string, name: string, icon: string) => void;
   deleteTheme: (id: string) => void;
@@ -40,7 +42,9 @@ export const useAppStore = create<AppState>()(
       selectedNoteId: null,
       selectedThemeId: null,
       selectedCategoryId: null,
+      isDashboardUiVisible: true,
 
+      toggleDashboardUi: () => set((state) => ({ isDashboardUiVisible: !state.isDashboardUiVisible })),
       addTheme: (name, icon) => set((state) => {
         const id = crypto.randomUUID();
         const maxOrder = state.themes.reduce((max, t) => Math.max(max, t.order || 0), -1);

@@ -68,7 +68,7 @@ const DraggableNote: React.FC<DraggableNoteProps> = ({ note, selectedNoteId, set
             style={style}
             className={cn(
                 "group flex items-center justify-between p-1.5 px-3 rounded-md cursor-pointer text-[13px] transition-all duration-200",
-                selectedNoteId === note.id ? "bg-violet-700/10 text-violet-400" : "text-zinc-500 hover:text-zinc-300 hover:bg-[#1a1a1e]"
+                selectedNoteId === note.id ? "bg-primary/10 text-primary" : "text-zinc-500 hover:text-zinc-300 hover:bg-border-subtle"
             )}
             onClick={() => setSelectedNote(note.id)}
         >
@@ -76,7 +76,7 @@ const DraggableNote: React.FC<DraggableNoteProps> = ({ note, selectedNoteId, set
                 <div {...listeners} {...attributes} className="cursor-grab active:cursor-grabbing p-1 -ml-1 hover:bg-zinc-800 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                     <GripVertical className="w-3 h-3 text-zinc-600" />
                 </div>
-                <FileText className="w-3.5 h-3.5 flex-shrink-0" />
+                <FileText className="w-3.5 h-3.5 shrink-0" />
                 <span className="truncate">{note.title || 'Sin título'}</span>
             </div>
             <button
@@ -116,22 +116,22 @@ const DroppableCategory: React.FC<DroppableCategoryProps> = ({
     });
 
     return (
-        <div ref={setNodeRef} className={cn("space-y-1 rounded-lg transition-colors p-0.5", isOver && "bg-violet-800/5 ring-1 ring-violet-500/30")}>
+        <div ref={setNodeRef} className={cn("space-y-1 rounded-lg transition-colors p-0.5", isOver && "bg-primary/5 ring-1 ring-primary/30")}>
             <div
                 className={cn(
                     "group flex items-center justify-between p-2 rounded-lg cursor-pointer text-sm transition-all duration-200",
-                    selectedCategoryId === category.id ? "bg-[#1f1f23] text-violet-400" : "text-zinc-400 hover:text-white hover:bg-[#1a1a1e]"
+                    selectedCategoryId === category.id ? "bg-surface-hover text-primary" : "text-zinc-400 hover:text-white hover:bg-border-subtle"
                 )}
                 onClick={() => setSelectedCategory(category.id === selectedCategoryId ? null : category.id)}
             >
                 <div className="flex items-center gap-2 overflow-hidden">
-                    <Hash className="w-4 h-4 flex-shrink-0 opacity-50" />
+                    <Hash className="w-4 h-4 shrink-0 opacity-50" />
                     <span className="truncate">{category.name}</span>
                 </div>
                 <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                         onClick={(e) => { e.stopPropagation(); handleAddNote(category.id); }}
-                        className="p-1 hover:bg-[#2b2b31] rounded"
+                        className="p-1 hover:bg-zinc-800 rounded"
                     >
                         <Plus className="w-3 h-3" />
                     </button>
@@ -195,7 +195,7 @@ const SortableThemeItem: React.FC<SortableThemeItemProps> = ({
             <div
                 className={cn(
                     "group flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all duration-200",
-                    isSelected ? "bg-[#1f1f23] text-violet-400" : "hover:bg-[#1a1a1e]"
+                    isSelected ? "bg-surface-hover text-primary" : "hover:bg-border-subtle"
                 )}
                 onClick={onToggle}
             >
@@ -203,20 +203,20 @@ const SortableThemeItem: React.FC<SortableThemeItemProps> = ({
                     <div {...listeners} {...attributes} className="cursor-grab active:cursor-grabbing p-1 -ml-1 hover:bg-zinc-800 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                         <GripVertical className="w-3.5 h-3.5 text-zinc-600" />
                     </div>
-                    {isExpanded ? <ChevronDown className="w-4 h-4 flex-shrink-0" /> : <ChevronRight className="w-4 h-4 flex-shrink-0" />}
+                    {isExpanded ? <ChevronDown className="w-4 h-4 shrink-0" /> : <ChevronRight className="w-4 h-4 shrink-0" />}
                     <span className="font-medium truncate">{theme.name}</span>
                     {theme.isFavorite && <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500 ml-auto mr-2" />}
                 </div>
                 <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                         onClick={(e) => { e.stopPropagation(); onFavorite(); }}
-                        className={cn("p-1 hover:bg-[#2b2b31] rounded transition-colors", theme.isFavorite ? "text-amber-500" : "text-zinc-500 hover:text-zinc-300")}
+                        className={cn("p-1 hover:bg-zinc-800 rounded transition-colors", theme.isFavorite ? "text-amber-500" : "text-zinc-500 hover:text-zinc-300")}
                     >
                         <Star className={cn("w-3.5 h-3.5", theme.isFavorite && "fill-amber-500")} />
                     </button>
                     <button
                         onClick={(e) => { e.stopPropagation(); onAddCategory(); }}
-                        className="p-1 hover:bg-[#2b2b31] rounded text-zinc-500 hover:text-zinc-300"
+                        className="p-1 hover:bg-zinc-800 rounded text-zinc-500 hover:text-zinc-300"
                     >
                         <FolderPlus className="w-3.5 h-3.5" />
                     </button>
@@ -229,7 +229,7 @@ const SortableThemeItem: React.FC<SortableThemeItemProps> = ({
                 </div>
             </div>
             {isExpanded && children && (
-                <div className="ml-4 pl-2 border-l border-[#26262b] space-y-1 duration-200">
+                <div className="ml-4 pl-2 border-l border-border space-y-1 duration-200">
                     {children}
                 </div>
             )}
@@ -379,16 +379,16 @@ export const Sidebar: React.FC = () => {
             onDragEnd={handleDragEnd}
             onDragCancel={() => setActiveId(null)}
         >
-            <div className="w-72 h-screen bg-[#141417] border-r border-[#26262b] flex flex-col text-[#e2e8f0] overflow-hidden select-none">
+            <div className="w-72 shrink-0 h-screen bg-surface border-r border-border flex flex-col text-[#e2e8f0] overflow-hidden select-none">
                 <div
-                    className="p-6 flex items-center gap-3 border-b border-[#26262b] cursor-pointer hover:bg-white/[0.02] transition-colors"
+                    className="p-6 flex items-center gap-3 border-b border-border cursor-pointer hover:bg-white/2 transition-colors"
                     onClick={() => {
                         setSelectedNote(null);
                         setSelectedTheme(null);
                         setSelectedCategory(null);
                     }}
                 >
-                    <div className="w-10 h-10 bg-violet-700 rounded-xl flex items-center justify-center shadow-lg shadow-violet-900/30">
+                    <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
                         <Brain className="w-6 h-6 text-white" />
                     </div>
                     <div>
@@ -404,7 +404,7 @@ export const Sidebar: React.FC = () => {
                             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Notas Sueltas</span>
                             <button
                                 onClick={() => handleAddNote('inbox')}
-                                className="p-1 hover:bg-[#26262b] rounded-md transition-colors text-zinc-400 hover:text-white"
+                                className="p-1 hover:bg-border rounded-md transition-colors text-zinc-400 hover:text-white"
                             >
                                 <Plus className="w-3.5 h-3.5" />
                             </button>
@@ -437,12 +437,12 @@ export const Sidebar: React.FC = () => {
                                         <div
                                             className={cn(
                                                 "flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all duration-200",
-                                                selectedThemeId === theme.id ? "bg-[#1f1f23] text-violet-400" : "hover:bg-[#1a1a1e] text-zinc-400"
+                                                selectedThemeId === theme.id ? "bg-surface-hover text-primary" : "hover:bg-border-subtle text-zinc-400"
                                             )}
                                             onClick={() => toggleTheme(theme.id)}
                                         >
                                             <div className="flex items-center gap-2 overflow-hidden flex-1">
-                                                {expandedThemes[theme.id] ? <ChevronDown className="w-4 h-4 flex-shrink-0" /> : <ChevronRight className="w-4 h-4 flex-shrink-0" />}
+                                                {expandedThemes[theme.id] ? <ChevronDown className="w-4 h-4 shrink-0" /> : <ChevronRight className="w-4 h-4 shrink-0" />}
                                                 <span className="font-medium truncate">{theme.name}</span>
                                             </div>
                                             <button
@@ -453,7 +453,7 @@ export const Sidebar: React.FC = () => {
                                             </button>
                                         </div>
                                         {expandedThemes[theme.id] && (
-                                            <div className="ml-4 pl-2 border-l border-[#26262b] space-y-1 mt-1">
+                                            <div className="ml-4 pl-2 border-l border-border space-y-1 mt-1">
                                                 {categories.filter(c => c.themeId === theme.id).map(category => (
                                                     <DroppableCategory
                                                         key={category.id}
@@ -488,7 +488,7 @@ export const Sidebar: React.FC = () => {
                             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Temas</span>
                             <button
                                 onClick={handleAddTheme}
-                                className="p-1 hover:bg-[#26262b] rounded-md transition-colors text-zinc-400 hover:text-white"
+                                className="p-1 hover:bg-border rounded-md transition-colors text-zinc-400 hover:text-white"
                             >
                                 <Plus className="w-3.5 h-3.5" />
                             </button>
@@ -543,7 +543,7 @@ export const Sidebar: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="mt-auto p-4 border-t border-[#26262b]/50">
+                <div className="mt-auto p-4 border-t border-border/50">
                     <p className="text-[10px] text-zinc-600 text-center uppercase tracking-widest font-medium">mApp Mental v1.0</p>
                 </div>
             </div>
@@ -558,14 +558,14 @@ export const Sidebar: React.FC = () => {
                 }),
             }}>
                 {activeId && activeId.startsWith('note-') ? (
-                    <div className="flex items-center gap-2 p-1.5 px-3 rounded-md bg-[#1f1f23] text-violet-400 shadow-xl border border-violet-500/30 w-56 cursor-grabbing">
-                        <FileText className="w-3.5 h-3.5 flex-shrink-0" />
+                    <div className="flex items-center gap-2 p-1.5 px-3 rounded-md bg-surface-hover text-primary shadow-xl border border-primary/30 w-56 cursor-grabbing">
+                        <FileText className="w-3.5 h-3.5 shrink-0" />
                         <span className="truncate text-[13px] font-medium">
                             {notes.find(n => `note-${n.id}` === activeId)?.title || 'Nota'}
                         </span>
                     </div>
                 ) : activeId && themes.find(t => t.id === activeId) ? (
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-[#1f1f23] text-violet-400 shadow-2xl border border-violet-500/50 w-64 cursor-grabbing">
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-surface-hover text-primary shadow-2xl border border-primary/50 w-64 cursor-grabbing">
                         <GripVertical className="w-3.5 h-3.5 text-zinc-500" />
                         <ChevronRight className="w-4 h-4" />
                         <span className="font-medium truncate">{themes.find(t => t.id === activeId)?.name}</span>
